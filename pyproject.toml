@@ -24,6 +24,8 @@ dependencies = [
     "httpx>=0.27.0",
     "tenacity>=8.2.3",
     "python-dotenv>=1.0.1",
+    "cryptography>=43.0.0",
+    "rapidfuzz>=3.10.0",
 ]
 
 [project.optional-dependencies]
@@ -31,12 +33,39 @@ dev = [
     "pytest>=8.1.0",
     "pytest-asyncio>=0.23.5",
     "pytest-timeout>=2.3.1",
+    "ruff>=0.7.0",
+    "bandit>=1.7.10",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cryptotrace*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = [
+    "unit: Unit tests for CryptoTrace modules",
+    "integration: FastAPI and SQLAlchemy integration tests",
+    "adversarial: Adversarial attack simulations and negative tests",
+]
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["cryptotrace", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "S", "SIM"]
+ignore = ["S101", "B008", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S105", "S106", "S108"]
+
+[tool.bandit]
+targets = ["cryptotrace"]
+exclude_dirs = ["tests", ".venv"]

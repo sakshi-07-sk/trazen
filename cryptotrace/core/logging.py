@@ -6,6 +6,8 @@ import sys
 from datetime import datetime, timezone
 from typing import Any, Dict
 
+from cryptotrace.core.logging_utils import SensitiveDataRedactionFilter
+
 
 class JSONFormatter(logging.Formatter):
     """Formats log records as JSON lines for log aggregators (ELK, Datadog)."""
@@ -34,6 +36,7 @@ def setup_logging(debug: bool = False, json_output: bool = False) -> logging.Log
     logger.handlers.clear()
 
     handler = logging.StreamHandler(sys.stdout)
+    handler.addFilter(SensitiveDataRedactionFilter())
     if json_output:
         handler.setFormatter(JSONFormatter())
     else:
@@ -44,6 +47,8 @@ def setup_logging(debug: bool = False, json_output: bool = False) -> logging.Log
             )
         )
 
+    if not any(isinstance(f, SensitiveDataRedactionFilter) for f in logger.filters):
+        logger.addFilter(SensitiveDataRedactionFilter())
     logger.addHandler(handler)
     logger.propagate = False
     return logger

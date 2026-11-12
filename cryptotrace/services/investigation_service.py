@@ -30,6 +30,8 @@ from cryptotrace.schemas.contracts import (
     TransactionGraph,
     TransactionSummary,
 )
+from cryptotrace.schemas.audit import AuditEventCreate
+from cryptotrace.services.audit.audit_service import AuditService
 from cryptotrace.services.ingestion_service import IngestionService
 
 
@@ -42,6 +44,7 @@ class InvestigationService:
         self.tx_repo = TransactionRepository(session)
         self.graph_repo = GraphRepository(session)
         self.ingestion_svc = IngestionService(session)
+        self.audit_svc = AuditService(session)
 
     async def create_and_execute(
         self, payload: InvestigationCreate
@@ -49,6 +52,20 @@ class InvestigationService:
         """Create a new investigation, ingest multi-hop transaction network, and build graph."""
         # 1. Create DB record
         inv = await self.inv_repo.create(payload)
+        await self.audit_svc.record_event(
+            AuditEventCreate(
+                investigation_id=inv.id,
+                event_type="INVESTIGATION_CREATED",
+                payload={
+                    "title": payload.title,
+                    "blockchain": payload.blockchain.value,
+                    "target_address": payload.target_address,
+                    "max_hops": payload.max_hops,
+                },
+            ),
+            actor_override="cryptotrace-engine",
+            actor_role_override="service",
+        )
 
         try:
             await self.inv_repo.update_status(inv.id, status="ingesting")
@@ -95,6 +112,19 @@ class InvestigationService:
                 total_transactions=len(canonical_txs),
                 total_nodes=trav_result.graph.node_count,
                 total_edges=trav_result.graph.edge_count,
+            )
+            await self.audit_svc.record_event(
+                AuditEventCreate(
+                    investigation_id=inv.id,
+                    event_type="INVESTIGATION_COMPLETED",
+                    payload={
+                        "total_transactions_ingested": len(canonical_txs),
+                        "total_nodes": trav_result.graph.node_count,
+                        "total_edges": trav_result.graph.edge_count,
+                    },
+                ),
+                actor_override="cryptotrace-engine",
+                actor_role_override="service",
             )
 
             response = self._to_response(inv)
@@ -237,6 +267,21 @@ class InvestigationService:
             include_heuristics=req.include_heuristics,
         )
         res = traversal_engine.traverse(trav_req)
+
+        await self.audit_svc.record_event(
+            AuditEventCreate(
+                investigation_id=inv.id,
+                event_type="INVESTIGATION_ANALYZED",
+                payload={
+                    "max_hops": hops,
+                    "nodes_discovered": res.graph.node_count,
+                    "edges_discovered": res.graph.edge_count,
+                    "include_heuristics": req.include_heuristics,
+                },
+            ),
+            actor_override="cryptotrace-engine",
+            actor_role_override="service",
+        )
 
         execution_ms = (time.perf_counter() - start_t) * 1000.0
 

@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+from uuid import uuid4
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,12 @@ from cryptotrace.api.v1.router import api_v1_router
 from cryptotrace.config import get_settings
 from cryptotrace.core.exceptions import CryptoTraceException
 from cryptotrace.core.logging import logger, setup_logging
+from cryptotrace.core.middleware import (
+    RateLimitHTTPMiddleware,
+    RequestSizeLimitMiddleware,
+    SecurityHeadersMiddleware,
+    SlidingWindowRateLimiter,
+)
 from cryptotrace.db.session import init_db
 
 settings = get_settings()
@@ -45,52 +52,73 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Middleware
+# Explicit CORS Middleware (wildcards rejected by Settings validator)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.CORS_ALLOWED_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Correlation-ID"],
 )
 
+# Role 3 Security Hardening Middlewares
+rate_limiter = SlidingWindowRateLimiter(requests_per_minute=settings.RATE_LIMIT_REQUESTS_PER_MINUTE)
+app.state.rate_limiter = rate_limiter
+app.add_middleware(RateLimitHTTPMiddleware, limiter=rate_limiter)
+app.add_middleware(RequestSizeLimitMiddleware, max_bytes=settings.MAX_REQUEST_BYTES)
+app.add_middleware(SecurityHeadersMiddleware)
 
-# Global Exception Handlers
+
+# Global Exception Handlers (preserving Team error envelope + adding correlation_id & sanitization)
 @app.exception_handler(CryptoTraceException)
 async def cryptotrace_exception_handler(request: Request, exc: CryptoTraceException) -> JSONResponse:
-    logger.warning(f"CryptoTrace error [{exc.code}] on {request.method} {request.url.path}: {exc.message}")
+    correlation_id = getattr(request.state, "correlation_id", str(uuid4()))
+    logger.warning(f"CryptoTrace error [{exc.code}] [{correlation_id}] on {request.method} {request.url.path}: {exc.message}")
     return JSONResponse(
         status_code=exc.status_code,
         content={
             "error": exc.code,
             "message": exc.message,
             "details": exc.details,
+            "correlation_id": correlation_id,
         },
     )
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    logger.warning(f"Request validation failure on {request.method} {request.url.path}: {exc}")
+    correlation_id = getattr(request.state, "correlation_id", str(uuid4()))
+    logger.warning(f"Request validation failure [{correlation_id}] on {request.method} {request.url.path}: {exc}")
+    sanitized_errors = [
+        {
+            "loc": err.get("loc", []),
+            "msg": err.get("msg", "Invalid field"),
+            "type": err.get("type", "value_error"),
+        }
+        for err in exc.errors()
+    ]
     return JSONResponse(
         status_code=422,
         content={
             "error": "VALIDATION_ERROR",
             "message": "Invalid request parameters or payload",
-            "details": exc.errors(),
+            "details": sanitized_errors,
+            "correlation_id": correlation_id,
         },
     )
 
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}", exc_info=True)
+    correlation_id = getattr(request.state, "correlation_id", str(uuid4()))
+    logger.error(f"Unhandled exception [{correlation_id}] on {request.method} {request.url.path}: {type(exc).__name__}", exc_info=settings.APP_DEBUG)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "INTERNAL_SERVER_ERROR",
             "message": "An unexpected internal server error occurred",
-            "details": {"exception_type": type(exc).__name__},
+            "details": {"exception_type": type(exc).__name__} if settings.APP_DEBUG else {},
+            "correlation_id": correlation_id,
         },
     )
 

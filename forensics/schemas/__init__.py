@@ -1,0 +1,53 @@
+"""Pydantic integration contracts for Role 1 inputs and Role 3/4 outputs."""
+
+from forensics.schemas.input import (
+    ChainType,
+    EntityLabel,
+    GraphEdge,
+    GraphNode,
+    InvestigationCase,
+    NormalizedTransaction,
+    RelationshipStatus,
+    UTXOEntry,
+)
+from forensics.schemas.output import (
+    ClusterEdgeReason,
+    ClusterGroup,
+    ContributingFactor,
+    CrossCaseAnalysisResponse,
+    CrossCaseFinding,
+    EvaluationMetrics,
+    ForensicAnalysisBundle,
+    ForensicFinding,
+    InvestigationFindingsResponse,
+    MLEvaluationReport,
+    ReceiverCandidate,
+    RiskAssessmentResponse,
+    WalletFeatureVector,
+    WalletRiskSummary,
+)
+
+__all__ = [
+    "ChainType",
+    "EntityLabel",
+    "GraphEdge",
+    "GraphNode",
+    "InvestigationCase",
+    "NormalizedTransaction",
+    "RelationshipStatus",
+    "UTXOEntry",
+    "ClusterEdgeReason",
+    "ClusterGroup",
+    "ContributingFactor",
+    "CrossCaseAnalysisResponse",
+    "CrossCaseFinding",
+    "EvaluationMetrics",
+    "ForensicAnalysisBundle",
+    "ForensicFinding",
+    "InvestigationFindingsResponse",
+    "MLEvaluationReport",
+    "ReceiverCandidate",
+    "RiskAssessmentResponse",
+    "WalletFeatureVector",
+    "WalletRiskSummary",
+]

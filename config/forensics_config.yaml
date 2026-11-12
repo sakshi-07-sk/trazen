@@ -1,0 +1,116 @@
+version: "1.0"
+
+general:
+  default_chain: "ethereum"
+  dormancy_threshold_seconds: 2592000  # 30 days
+  dormancy_reactivation_min_txs: 2
+
+clustering:
+  rule_version: "1.0"
+  max_cioh_confidence: 0.72
+  coinjoin_min_inputs: 3
+  coinjoin_min_equal_outputs: 3
+  coinjoin_value_tolerance: 0.005
+  repeated_counterparty_min_txs: 4
+  timing_window_seconds: 300
+  min_timing_pair_count: 3
+  cluster_confidence_cap: 0.85
+
+peel_chain:
+  rule_version: "1.0"
+  min_hops: 3
+  min_continuation_ratio: 0.65
+  max_continuation_ratio: 0.995
+  max_hop_delay_seconds: 86400  # 24 hours
+  min_hop_value_btc: 0.001
+  min_hop_value_eth: 0.01
+
+mixer_fan:
+  rule_version: "1.0"
+  fan_in_min_unique_senders: 5
+  fan_in_min_ratio: 0.70
+  fan_out_min_unique_receivers: 5
+  fan_out_min_ratio: 0.70
+  mixer_min_inbound: 4
+  mixer_min_outbound: 4
+  mixer_equal_denomination_tolerance: 0.02
+  mixer_min_equal_denomination_ratio: 0.55
+  mixer_max_turnaround_seconds: 14400  # 4 hours
+  exchange_high_volume_min_txs: 20
+
+structuring:
+  rule_version: "1.0"
+  chains:
+    bitcoin:
+      min_split_count: 4
+      small_tx_upper_bound: 0.25
+      reporting_reference_threshold: 0.50
+      threshold_avoidance_lower_ratio: 0.70
+      threshold_avoidance_upper_ratio: 0.99
+      max_burst_window_seconds: 7200
+      min_value_similarity_cv: 0.18
+      rapid_passthrough_window_seconds: 3600
+      rapid_passthrough_min_ratio: 0.80
+    ethereum:
+      min_split_count: 4
+      small_tx_upper_bound: 2.5
+      reporting_reference_threshold: 5.0
+      threshold_avoidance_lower_ratio: 0.70
+      threshold_avoidance_upper_ratio: 0.99
+      max_burst_window_seconds: 3600
+      min_value_similarity_cv: 0.18
+      rapid_passthrough_window_seconds: 1800
+      rapid_passthrough_min_ratio: 0.80
+    default:
+      min_split_count: 4
+      small_tx_upper_bound: 1000.0
+      reporting_reference_threshold: 10000.0
+      threshold_avoidance_lower_ratio: 0.70
+      threshold_avoidance_upper_ratio: 0.99
+      max_burst_window_seconds: 7200
+      min_value_similarity_cv: 0.18
+      rapid_passthrough_window_seconds: 3600
+      rapid_passthrough_min_ratio: 0.80
+
+cross_case:
+  rule_version: "1.0"
+  min_shared_cases: 2
+  exclude_benign_public_hub_categories:
+    - "exchange"
+    - "cex"
+    - "payment_processor"
+    - "defi_router"
+    - "bridge"
+  min_overlapping_path_length: 2
+
+risk_scoring:
+  rule_version: "1.0"
+  priority_weights:
+    severity_score: 0.35
+    finding_density: 0.20
+    known_risk_exposure: 0.25
+    anomaly_signal: 0.20
+  attribution_weights:
+    confirmed_edge_ratio: 0.40
+    path_continuity: 0.25
+    finding_confidence: 0.20
+    investigation_coverage: 0.15
+  exposure_hop_decay: 0.55
+  max_exposure_hops: 4
+  mixer_exposure_cap_without_illicit_link: 0.45
+
+receiver_ranking:
+  rule_version: "1.0"
+  weights:
+    trace_position: 0.20
+    value_proportion: 0.25
+    path_consistency: 0.20
+    supporting_findings: 0.15
+    label_provenance: 0.10
+    investigation_coverage: 0.10
+
+ml:
+  random_state: 42
+  isolation_forest_contamination: 0.15
+  dbscan_eps: 1.8
+  dbscan_min_samples: 3

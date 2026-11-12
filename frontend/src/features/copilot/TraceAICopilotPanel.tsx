@@ -127,7 +127,7 @@ export function TraceAICopilotPanel({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-slate-100 text-sm">TraceAI COPILOT</span>
-              <Badge variant="verified">GROUNDED FORENSICS</Badge>
+              <Badge variant="verified">Rule-based, evidence-grounded assistant</Badge>
             </div>
             <span className="text-[10px] text-slate-400">CASE: {investigation.caseId}</span>
           </div>

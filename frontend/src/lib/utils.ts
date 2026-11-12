@@ -11,6 +11,8 @@ export function formatAddress(address: string, start = 6, end = 4): string {
   return `${address.substring(0, start)}...${address.substring(address.length - end)}`;
 }
 
+export const truncateAddress = formatAddress;
+
 export function formatHash(hash: string, start = 8, end = 6): string {
   if (!hash) return "";
   if (hash.length <= start + end) return hash;
@@ -33,4 +35,29 @@ export function formatUSD(amount: number): string {
 export function formatTimestamp(timestamp: string | number): string {
   const date = typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp * 1000);
   return date.toISOString().replace("T", " ").substring(0, 19) + " UTC";
+}
+
+export function getCaseRiskScore(c: {
+  nodes: { riskScore: number }[];
+  findings: { severity: string }[];
+}): number {
+  if (c.nodes.length > 0) {
+    return Math.max(...c.nodes.map((n) => n.riskScore));
+  }
+  return c.findings.some((f) => f.severity === "CRITICAL") ? 90 : 50;
+}
+
+export function getCaseConfidence(c: {
+  receivers: { attributionConfidence: number }[];
+  findings: { confidence: number }[];
+}): number {
+  if (c.receivers.length > 0) {
+    return Math.round(c.receivers[0].attributionConfidence);
+  }
+  if (c.findings.length > 0) {
+    return Math.round(
+      c.findings.reduce((acc, f) => acc + f.confidence, 0) / c.findings.length
+    );
+  }
+  return 0;
 }

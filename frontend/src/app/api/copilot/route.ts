@@ -60,12 +60,12 @@ export async function POST(req: NextRequest) {
       message: responseText,
       evidenceIds,
       findings,
+      assistantMode: "Rule-based, evidence-grounded assistant",
       isOffline: true,
     });
-  } catch (err: unknown) {
-    const error = err as Error;
+  } catch {
     return NextResponse.json(
-      { code: "COPILOT_ERROR", message: error.message || "Failed to execute copilot query" },
+      { code: "COPILOT_ERROR", message: "Failed to execute copilot query" },
       { status: 500 }
     );
   }

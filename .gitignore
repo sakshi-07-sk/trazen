@@ -48,4 +48,5 @@ frontend/.next/
 frontend/test-results/
 frontend/playwright-report/
 frontend/.env*.local
+frontend/.firebase/
 !frontend/src/lib/

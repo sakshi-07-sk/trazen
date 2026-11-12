@@ -6,6 +6,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
 from cryptotrace.api.v1.endpoints.health import router as root_health_router
 from cryptotrace.api.v1.router import api_v1_router
@@ -16,6 +20,8 @@ from cryptotrace.db.session import init_db
 
 settings = get_settings()
 setup_logging(debug=settings.APP_DEBUG)
+
+limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
 
 
 @asynccontextmanager
@@ -31,6 +37,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("CryptoTrace Engine shutting down.")
 
 
+is_production = settings.APP_ENV.lower() == "production"
+
 app = FastAPI(
     title="CryptoTrace — Blockchain Forensics & Threat Intelligence",
     description=(
@@ -39,16 +47,26 @@ app = FastAPI(
         "and investigation APIs."
     ),
     version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
+    docs_url=None if is_production else "/docs",
+    redoc_url=None if is_production else "/redoc",
+    openapi_url=None if is_production else "/openapi.json",
     lifespan=lifespan,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+cors_origins = [
+    origin.strip()
+    for origin in settings.CORS_ORIGINS.split(",")
+    if origin.strip()
+] or ["http://localhost:3000"]
 
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -90,10 +108,13 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         content={
             "error": "INTERNAL_SERVER_ERROR",
             "message": "An unexpected internal server error occurred",
-            "details": {"exception_type": type(exc).__name__},
         },
     )
 
+
+for route in root_health_router.routes:
+    if hasattr(route, "endpoint"):
+        limiter.exempt(route.endpoint)
 
 # Root health endpoint (/health) as required by specification
 app.include_router(root_health_router)

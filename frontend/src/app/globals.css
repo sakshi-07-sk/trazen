@@ -3,34 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --background: #070b12;
-  --foreground: #f1f5f9;
+  --bg-void: #000000;
+  --bg-main: #080909;
+  --bg-surface: #151616;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --text-primary: #F1EEE6;
+  --text-secondary: #A6A39A;
+  --accent-cyan: #FF6A13;
+  --accent-cyan-glow: rgba(255, 106, 19, 0.18);
+  --sev-critical: #EF4444;
+  --sev-high: #F97316;
+  --sev-medium: #F59E0B;
+  --sev-low: #22C55E;
+}
+
+html {
+  background: var(--bg-main);
+  color: var(--text-primary);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text-primary);
+  background: var(--bg-main);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
 }
 
-/* Custom sleek scrollbar for enterprise forensic terminals */
+/* Subtle glass panel utility */
+.glass-panel {
+  background: rgba(21, 22, 22, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cyan-hairline {
+  border-color: rgba(255, 106, 19, 0.35);
+  box-shadow: 0 0 24px -10px rgba(255, 106, 19, 0.25);
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid #FF6A13;
+  outline-offset: 2px;
+}
+
+/* Sleek forensic scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #070b12;
+  background: #080909;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: rgba(255, 255, 255, 0.14);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: rgba(255, 106, 19, 0.55);
 }
 
 /* Cytoscape container styling */
@@ -38,13 +72,19 @@ body {
   width: 100%;
   height: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
 }
 
-/* Print styling for forensic reports */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styling for forensic PDF reports */
 @media print {
   body {
     background: #ffffff !important;

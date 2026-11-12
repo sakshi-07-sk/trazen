@@ -20,7 +20,11 @@ import {
   SlidersHorizontal,
   Info,
   Layers,
+  Download,
+  Minimize2,
 } from "lucide-react";
+
+type GraphLayoutMode = "breadthfirst" | "cose" | "circle" | "concentric";
 
 interface CytoscapeGraphProps {
   nodes: GraphNode[];
@@ -39,8 +43,11 @@ export function CytoscapeGraph({
   selectedNodeId,
   className,
 }: CytoscapeGraphProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
+  const [layoutMode, setLayoutMode] = useState<GraphLayoutMode>("breadthfirst");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Graph interaction state
   const [searchTerm, setSearchTerm] = useState("");
@@ -296,20 +303,56 @@ export function CytoscapeGraph({
   }, [selectedNodeId]);
 
   // Layout Controls
+  const runLayout = (name: GraphLayoutMode) => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    if (name === "breadthfirst") {
+      cy.layout({
+        name: "breadthfirst",
+        directed: true,
+        padding: 50,
+        spacingFactor: 1.6,
+      }).run();
+    } else {
+      cy.layout({
+        name,
+        padding: 50,
+        animate: true,
+      }).run();
+    }
+  };
+
+  const handleLayoutChange = (name: GraphLayoutMode) => {
+    setLayoutMode(name);
+    runLayout(name);
+  };
+
+  const handleExportPng = () => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    const pngDataUrl = cy.png({ full: true, bg: "#07090C", scale: 2 });
+    const link = document.createElement("a");
+    link.href = pngDataUrl;
+    link.download = `cryptotrace-graph-${Date.now()}.png`;
+    link.click();
+  };
+
+  const handleToggleFullscreen = () => {
+    if (!wrapperRef.current) return;
+    if (!document.fullscreenElement) {
+      wrapperRef.current.requestFullscreen?.().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen?.().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  };
+
   const handleZoomIn = () => cyRef.current?.zoom(cyRef.current.zoom() * 1.25);
   const handleZoomOut = () => cyRef.current?.zoom(cyRef.current.zoom() * 0.8);
   const handleFit = () => cyRef.current?.fit(undefined, 40);
-  const handleResetLayout = () => {
-    cyRef.current?.layout({
-      name: "breadthfirst",
-      directed: true,
-      padding: 50,
-      spacingFactor: 1.6,
-    }).run();
-  };
+  const handleResetLayout = () => runLayout(layoutMode);
 
   return (
-    <div className={cn("relative w-full h-[600px] bg-[#070b14] border border-cyber-border rounded-lg overflow-hidden flex flex-col", className)}>
+    <div ref={wrapperRef} className={cn("relative w-full h-[600px] bg-[#07090C] border border-white/[0.08] rounded overflow-hidden flex flex-col", className)}>
       {/* Top Graph Toolbar */}
       <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between gap-3 pointer-events-none">
         {/* Search Bar */}
@@ -435,8 +478,8 @@ export function CytoscapeGraph({
         </div>
       )}
 
-      {/* Floating Canvas Controls (Zoom/Pan/Reset) */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-1.5 bg-cyber-surface/90 backdrop-blur-md border border-cyber-border rounded p-1 shadow-lg pointer-events-auto">
+      {/* Floating Canvas Controls (Zoom/Pan/Reset/Layout/Export) */}
+      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-[#0E1217]/95 backdrop-blur-md border border-white/[0.1] rounded p-1 shadow-lg pointer-events-auto">
         <button
           onClick={handleZoomIn}
           title="Zoom In"
@@ -464,6 +507,32 @@ export function CytoscapeGraph({
           className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
+        </button>
+        <select
+          value={layoutMode}
+          onChange={(e) => handleLayoutChange(e.target.value as GraphLayoutMode)}
+          title="Graph Layout"
+          aria-label="Graph Layout"
+          className="h-7 px-2 rounded bg-[#07090C] border border-white/[0.08] text-[11px] font-mono text-[#F5F7FA]"
+        >
+          <option value="breadthfirst">Hierarchical</option>
+          <option value="cose">Force (COSE)</option>
+          <option value="circle">Circular</option>
+          <option value="concentric">Concentric</option>
+        </select>
+        <button
+          onClick={handleExportPng}
+          title="Export Graph PNG"
+          className="p-1.5 text-[#00E5FF] hover:bg-[#00E5FF]/15 rounded transition-colors"
+        >
+          <Download className="w-4 h-4" />
+        </button>
+        <button
+          onClick={handleToggleFullscreen}
+          title="Toggle Fullscreen"
+          className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded transition-colors"
+        >
+          <Minimize2 className="w-4 h-4" />
         </button>
       </div>
 

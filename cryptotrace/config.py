@@ -11,10 +11,12 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "CryptoTrace-Engine"
     APP_ENV: str = "development"
-    APP_DEBUG: bool = True
+    APP_DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
+    API_KEYS: str = ""
+    CORS_ORIGINS: str = "http://localhost:3000"
 
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./cryptotrace.db"

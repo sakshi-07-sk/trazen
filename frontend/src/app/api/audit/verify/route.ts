@@ -27,6 +27,6 @@ export async function GET(req: NextRequest) {
     recordsCount: records.length,
     headHash,
     chainIntegrity: isChainValid ? "INTACT" : "TAMPERED",
-    details: `Verified ${records.length} sequential SHA-256 tamper-evident evidence blocks against Merkle root checkpoints. All hashes match RPC genesis timestamps.`,
+    details: `Verified ${records.length} sequential evidence blocks via SHA-256 hash-chain check.`,
   });
 }

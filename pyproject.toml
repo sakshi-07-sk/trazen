@@ -63,6 +63,9 @@ src = ["cryptotrace", "tests"]
 select = ["E", "F", "I", "UP", "B", "S", "SIM"]
 ignore = ["S101", "B008", "E501"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["cryptotrace"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S105", "S106", "S108"]
 

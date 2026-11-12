@@ -35,3 +35,4 @@ class AuditEventModel(Base):
     hash_algorithm: Mapped[str] = mapped_column(String(32), nullable=False)
     serialization_version: Mapped[str] = mapped_column(String(64), nullable=False)
     hash_construction_version: Mapped[str] = mapped_column(String(64), nullable=False)
+

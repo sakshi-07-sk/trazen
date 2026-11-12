@@ -214,3 +214,4 @@ async def test_role1_investigation_to_role3_security_scan_btc_and_eth(
         v_data = verify_resp.json()
         assert v_data["is_valid"] is True
         assert v_data["verified_events"] >= 3
+

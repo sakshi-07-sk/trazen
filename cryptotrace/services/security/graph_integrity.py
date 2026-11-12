@@ -459,3 +459,4 @@ class GraphIntegrityAnalyzer:
             is_integrity_clean=len(findings) == 0,
         )
         return summary, findings
+

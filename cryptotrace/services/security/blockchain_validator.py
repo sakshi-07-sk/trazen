@@ -596,3 +596,4 @@ class BlockchainDataValidator:
             return [], IndependentVerificationStatus.NOT_INDEPENDENT, warnings
 
         return [], IndependentVerificationStatus.VERIFIED_AGREE, warnings
+

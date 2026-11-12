@@ -256,3 +256,4 @@ def enforce_investigation_access(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied for the requested investigation.",
         )
+

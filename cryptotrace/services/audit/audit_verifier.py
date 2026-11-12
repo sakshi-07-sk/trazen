@@ -58,7 +58,8 @@ class AuditVerifier:
         if self._session is not None:
             rows = (await self._session.execute(stmt)).scalars().all()
         else:
-            assert self._session_factory is not None
+            if self._session_factory is None:
+                raise RuntimeError("AuditVerifier requires an AsyncSession or async_sessionmaker.")
             async with self._session_factory() as session:
                 rows = (await session.execute(stmt)).scalars().all()
 
@@ -322,3 +323,4 @@ class AuditVerifier:
             head_hash=head_hash,
             tail_hash=tail_hash,
         )
+

@@ -61,3 +61,4 @@ def downgrade() -> None:
     op.drop_index("ix_security_audit_events_investigation_id", table_name="security_audit_events")
     op.drop_index("ix_security_audit_events_event_id", table_name="security_audit_events")
     op.drop_table("security_audit_events")
+

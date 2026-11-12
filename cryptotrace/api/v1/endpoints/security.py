@@ -463,3 +463,4 @@ async def export_audit_history(
 # Ensure AsyncSession dependency import stays discoverable for FastAPI type inspection
 _SESSION_DEP = get_db
 _SESSION_TYPE = AsyncSession
+

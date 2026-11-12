@@ -153,3 +153,4 @@ def test_canonical_bitcoin_utxo_records_validate_cleanly() -> None:
     reports = validator.validate_batch("inv-btc-val", records)
     assert len(reports) == 4
     assert all(r.validation_status == ValidationStatus.VALID for r in reports)
+

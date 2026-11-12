@@ -133,3 +133,4 @@ def compute_event_hash(
     canonical_envelope = canonicalize_json(envelope)
     material = f"CryptoTrace:AuditEvent:v1:{canonical_envelope}".encode()
     return hashlib.sha256(material).hexdigest()
+

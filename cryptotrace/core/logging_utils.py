@@ -67,3 +67,4 @@ def get_security_logger(name: str = "cryptotrace.security") -> logging.Logger:
         sec_logger.setLevel(logging.INFO)
         sec_logger.propagate = False
     return sec_logger
+

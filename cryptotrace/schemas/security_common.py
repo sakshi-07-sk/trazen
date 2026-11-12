@@ -107,3 +107,4 @@ class EvidenceReference(BaseModel):
     chain: str | None = Field(default=None, max_length=64)
     provider: str | None = Field(default=None, max_length=128)
     detail: str | None = Field(default=None, max_length=1000)
+

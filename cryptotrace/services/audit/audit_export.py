@@ -112,3 +112,4 @@ class AuditExportService:
             return True
         except (InvalidSignature, ValueError, TypeError):
             return False
+

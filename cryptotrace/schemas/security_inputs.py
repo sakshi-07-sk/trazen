@@ -118,3 +118,4 @@ class GraphEdgeInput(BaseModel):
     log_index: int | None = None
     vout: int | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
+

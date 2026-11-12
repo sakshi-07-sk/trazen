@@ -77,3 +77,4 @@ class SharedFindingAdapter:
                 **finding.metadata,
             },
         }
+

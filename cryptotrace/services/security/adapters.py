@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 from cryptotrace.db.models.transaction import TransactionModel
 from cryptotrace.schemas.common import BlockchainType, EdgeType
 from cryptotrace.schemas.graph import GraphEdge, GraphNode, TransactionGraph
@@ -351,6 +353,14 @@ def graph_edge_to_security_input(edge: GraphEdge, chain: str) -> GraphEdgeInput:
         if len(parts) >= 2:
             token_contract = parts[1]
 
+    # Recover exact satoshi Decimal when SQLite Numeric(38, 18) introduces float64 ulp noise (~1e-16),
+    # while preserving real discrepancies (> 1e-12) so tampered DB amounts are still flagged.
+    resolved_amount = edge.amount
+    if chain == BlockchainType.BITCOIN.value and edge.properties.get("amount_sats") is not None:
+        exact_sats_btc = Decimal(str(edge.properties["amount_sats"])) / Decimal("100000000")
+        if abs(edge.amount - exact_sats_btc) <= Decimal("1e-12"):
+            resolved_amount = exact_sats_btc
+
     return GraphEdgeInput(
         edge_id=edge.id,
         source=edge.source,
@@ -363,7 +373,7 @@ def graph_edge_to_security_input(edge: GraphEdge, chain: str) -> GraphEdgeInput:
         block_number=edge.block_number,
         asset=edge.asset_symbol,
         token_contract=token_contract,
-        amount=edge.amount,
+        amount=resolved_amount,
         provenance_ref=edge.properties.get("provenance_ref"),
         log_index=_parse_log_index_from_evidence_ref(edge.evidence_reference),
         vout=_parse_vout_from_edge(edge),
@@ -387,3 +397,4 @@ def transaction_graph_to_security_inputs(
         for e in graph.edges
     ]
     return sec_nodes, sec_edges
+

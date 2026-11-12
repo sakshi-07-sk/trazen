@@ -33,3 +33,4 @@ __all__ = [
     "normalize_chain_name",
     "validate_and_normalize_address",
 ]
+

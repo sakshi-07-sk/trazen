@@ -509,3 +509,4 @@ class AddressSimilarityAnalyzer:
             pattern_flags=tuple(flags),
             explanation=explanation,
         )
+

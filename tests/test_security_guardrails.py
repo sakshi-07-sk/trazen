@@ -102,3 +102,4 @@ def test_traceai_output_validation_blocks_fabricated_hashes_and_leaks() -> None:
         epistemic_label=EpistemicLabel.SUSPICIOUS_INDICATOR,
     )
     assert good_out.approved
+

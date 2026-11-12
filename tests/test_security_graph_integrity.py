@@ -312,3 +312,4 @@ def test_legitimate_ethereum_native_and_erc20_graph_produces_no_false_violations
     assert summary.flagged_edge_count == 0
     assert summary.validated_edge_count == len(edges)
     assert findings == []
+

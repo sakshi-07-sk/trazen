@@ -202,7 +202,8 @@ class AuditService:
                     f"Failed to append audit event for '{investigation_id}' after {max_retries} savepoint retries"
                 ) from last_error
 
-            assert self._session_factory is not None
+            if self._session_factory is None:
+                raise RuntimeError("AuditService requires an AsyncSession or async_sessionmaker.")
             for attempt in range(max_retries):
                 async with self._session_factory() as session:
                     try:
@@ -248,7 +249,8 @@ class AuditService:
             rows = (await self._session.execute(stmt)).scalars().all()
             return [model_to_record(row) for row in rows]
 
-        assert self._session_factory is not None
+        if self._session_factory is None:
+            raise RuntimeError("AuditService requires an AsyncSession or async_sessionmaker.")
         async with self._session_factory() as session:
             rows = (await session.execute(stmt)).scalars().all()
             return [model_to_record(row) for row in rows]
@@ -266,7 +268,9 @@ class AuditService:
             rows = (await self._session.execute(stmt)).scalars().all()
             return [model_to_record(row) for row in rows]
 
-        assert self._session_factory is not None
+        if self._session_factory is None:
+            raise RuntimeError("AuditService requires an AsyncSession or async_sessionmaker.")
         async with self._session_factory() as session:
             rows = (await session.execute(stmt)).scalars().all()
             return [model_to_record(row) for row in rows]
+

@@ -101,3 +101,4 @@ def test_unicode_homoglyph_and_bidi_inspection() -> None:
     assert spoof["has_invisible_or_bidi"]
     assert spoof["has_confusables"]
     assert spoof["mixed_scripts"]
+

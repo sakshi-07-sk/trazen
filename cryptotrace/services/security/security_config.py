@@ -142,3 +142,4 @@ class DetectionThresholds:
     # Blockchain validation limits
     max_future_timestamp_skew_seconds: int = 600
     min_valid_block_year: int = 2009
+

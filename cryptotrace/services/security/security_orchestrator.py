@@ -30,7 +30,10 @@ from cryptotrace.services.security.blockchain_validator import (
     BlockchainValidationReport,
 )
 from cryptotrace.services.security.dusting_detector import DustingDetector
-from cryptotrace.services.security.graph_integrity import GraphIntegrityAnalyzer, GraphIntegritySummary
+from cryptotrace.services.security.graph_integrity import (
+    GraphIntegrityAnalyzer,
+    GraphIntegritySummary,
+)
 from cryptotrace.services.security.token_impersonation import TokenImpersonationDetector
 
 
@@ -177,3 +180,4 @@ class SecurityOrchestrator:
             "findings": findings,
             "shared_findings": [SharedFindingAdapter.to_shared_finding_dict(f) for f in findings],
         }
+

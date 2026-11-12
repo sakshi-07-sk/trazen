@@ -52,3 +52,4 @@ def test_canonical_and_unrelated_clean_tokens_do_not_trigger_impersonation() -> 
 
     assert detector.analyze("inv-tok-clean", canonical_usdc) == []
     assert detector.analyze("inv-tok-clean", legit_custom) == []
+

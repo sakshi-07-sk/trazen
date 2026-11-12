@@ -229,3 +229,4 @@ async def test_audit_export_manifest_ed25519_signature_and_offline_verification(
     manifest.events[0].canonical_payload_json = '{"case":"forged"}'
     assert not AuditExportService.verify_manifest_signature(manifest)
     assert not verifier.verify_manifest(manifest).is_valid
+

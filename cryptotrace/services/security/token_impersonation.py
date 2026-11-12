@@ -390,3 +390,4 @@ class TokenImpersonationDetector:
             break
 
         return findings
+

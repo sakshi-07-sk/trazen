@@ -131,3 +131,4 @@ def test_legitimate_similar_addresses_do_not_trigger_poisoning_accusation() -> N
     )
     assert not any(f.finding_category == FindingCategory.ADDRESS_POISONING for f in findings)
     assert not any(f.severity in (Severity.HIGH, Severity.CRITICAL) for f in findings)
+

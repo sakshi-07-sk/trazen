@@ -164,3 +164,4 @@ def test_repeated_target_dust_deposits_from_distinct_senders_flagged() -> None:
     findings = detector.analyze(investigation_id="inv-dust-target", transactions=txs)
     assert len(findings) == 1
     assert findings[0].finding_type == "repeated_target_dust_deposits"
+

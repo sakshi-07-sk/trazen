@@ -167,9 +167,26 @@ from cryptotrace.schemas.contracts import (
 ```
 
 ### Role 4 (Web Frontend Client Subsystem)
-Consume standard REST endpoints and Pydantic envelopes:
-- `POST /api/v1/investigations`: Start case and return `InvestigationResponse`.
-- `GET /api/v1/investigations/{id}`: Fetch case details.
-- `GET /api/v1/investigations/{id}/graph`: Fetch D3/Cytoscape-ready `TransactionGraph`.
-- `GET /api/v1/investigations/{id}/transactions`: Paginated `PaginatedResponse[TransactionSummary]`.
-- `POST /api/v1/investigations/{id}/analyze`: Dynamic re-analysis with custom filters and `FlowAnalysis`.
+Located in `frontend/` — Built with Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Cytoscape.js, and Playwright:
+- **Investigation Command Center:** SOC KPI metrics, multi-case repository, threat alert feed.
+- **Interactive Trace Graph:** Cytoscape.js multi-hop graph explorer with custom styling for confirmed transfers, UTXO spending, tokens, cross-chain bridges, and peel chains.
+- **Wallet Intelligence View:** Differentiates direct on-chain observations from heuristic cluster inferences.
+- **Suspicious Findings Matrix:** Rule anomaly breakdown with technical limitations caveats and severity filtering.
+- **Receiver Intelligence:** Ranked destination attribution candidates with ethical restraint notice.
+- **Evidence Vault:** Cryptographic consensus RPC receipts and sequential SHA-256 hash-chain verification.
+- **TraceAI Copilot:** Evidence-grounded forensic assistant with offline fallback engine.
+- **Investigation Dossier:** Printable/PDF, Markdown, and JSON forensic reports.
+
+Quick Start:
+```bash
+cd frontend
+npm install
+npm run build
+npm run start
+```
+Run Test Suites:
+```bash
+cd frontend
+npm run test:all
+```
+For full engineering guide, see [`frontend/USER_GUIDE.md`](frontend/USER_GUIDE.md).

@@ -10,8 +10,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -41,3 +41,11 @@ htmlcov/
 .idea/
 .vscode/
 *.swp
+
+# Frontend (Node / Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/test-results/
+frontend/playwright-report/
+frontend/.env*.local
+!frontend/src/lib/

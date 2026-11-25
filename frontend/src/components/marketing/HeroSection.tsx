@@ -24,7 +24,7 @@ export function HeroSection() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#151616] border border-[#FF6A13]/40 text-[#FF6A13] text-[11px] font-mono tracking-wider uppercase mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A13] animate-pulse" />
-            HACK2SKILL PROMPTWARS x AI VIBEATHON 2026
+            CRYPTOTRACE — BLOCKCHAIN FORENSICS & THREAT INTELLIGENCE
           </div>
 
           <h1

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MOCK_ETH_CASE, MOCK_BTC_CASE } from "@/lib/mockData";
+import { importedCasesStore } from "@/lib/importedStore";
 import {
   BACKEND_URL,
   enrichEmptyGraphCase,
@@ -14,6 +15,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const caseId = decodeURIComponent(params.id);
+
+  if (importedCasesStore.has(caseId)) {
+    return NextResponse.json(importedCasesStore.get(caseId)!);
+  }
 
   if (USE_MOCK) {
     if (

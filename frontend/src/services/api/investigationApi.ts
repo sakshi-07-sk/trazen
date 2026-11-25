@@ -57,7 +57,15 @@ export const investigationApi = {
     type: "address" | "transaction";
     maxHops: number;
     timeRange?: { from?: string; to?: string };
-    mode?: "auto" | "demo" | "live";
+    mode?: "auto" | "demo" | "live" | "imported";
+    importedTransactions?: Array<{
+      txHash: string;
+      from: string;
+      to: string;
+      amount: number;
+      currency?: string;
+      timestamp?: string;
+    }>;
   }): Promise<InvestigationCase> {
     const res = await fetch(`${API_BASE_URL}/api/investigations`, {
       method: "POST",

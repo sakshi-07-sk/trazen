@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/marketing/Navbar";
 import { HeroSection } from "@/components/marketing/HeroSection";
 import { StatisticsStrip } from "@/components/marketing/StatisticsStrip";
+import { ProblemSection } from "@/components/marketing/ProblemSection";
 import { AboutSection } from "@/components/marketing/AboutSection";
 import { PlatformSection } from "@/components/marketing/PlatformSection";
 import { WorkflowSection } from "@/components/marketing/WorkflowSection";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <StatisticsStrip />
+        <ProblemSection />
         <AboutSection />
         <PlatformSection />
         <WorkflowSection />

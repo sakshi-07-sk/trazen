@@ -177,7 +177,7 @@ export interface InvestigationCase {
   maxHops: number;
   timeRange?: { from?: string; to?: string };
   isDemo: boolean;
-  dataSourceMode: "LIVE_RPC" | "DEMO_REPLAY";
+  dataSourceMode: "LIVE_RPC" | "DEMO_REPLAY" | "IMPORTED_DATA";
   nodes: GraphNode[];
   edges: GraphEdge[];
   findings: SuspiciousFinding[];

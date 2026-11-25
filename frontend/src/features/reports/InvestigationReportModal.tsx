@@ -38,8 +38,13 @@ export function InvestigationReportModal({
 **Case ID:** ${investigation.caseId}
 **Date Generated:** ${new Date().toISOString()}
 **Target Identifier:** ${investigation.target}
-**Blockchain Network:** ${investigation.network}
-**Data Mode:** ${investigation.isDemo ? "DEMONSTRATION ARCHIVE REPLAY" : "LIVE CONSENSUS NODE"}
+**Data Provenance Mode:** ${
+  investigation.dataSourceMode === "IMPORTED_DATA"
+    ? "IMPORTED DATASET (USER-VERIFIED)"
+    : investigation.isDemo
+    ? "SYNTHETIC DEMONSTRATION REPLAY"
+    : "LIVE CONSENSUS NODE"
+}
 
 ---
 
@@ -120,7 +125,13 @@ Public blockchain addresses represent cryptographic accounts and do not assert p
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-cyber-primary" />
             <span className="font-bold">FORENSIC CASE DOSSIER PREVIEW</span>
-            {investigation.isDemo && <Badge variant="demo">SYNTHETIC DEMO RECORD</Badge>}
+            {investigation.dataSourceMode === "IMPORTED_DATA" ? (
+              <Badge variant="info">IMPORTED DATASET</Badge>
+            ) : investigation.isDemo ? (
+              <Badge variant="demo">SYNTHETIC DEMO RECORD</Badge>
+            ) : (
+              <Badge variant="clean">LIVE ARCHIVE CONSENSUS</Badge>
+            )}
           </div>
 
           <div className="flex items-center gap-2">

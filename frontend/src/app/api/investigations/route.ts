@@ -4,6 +4,7 @@ import { MOCK_ETH_CASE, MOCK_BTC_CASE } from "@/lib/mockData";
 import { validateCryptoInput } from "@/lib/validation";
 import {
   BACKEND_URL,
+  enrichEmptyGraphCase,
   getBackendHeaders,
   mapBackendToInvestigationCase,
 } from "@/lib/mapper";
@@ -166,7 +167,9 @@ export async function POST(req: NextRequest) {
     );
     const graph = graphRes.ok ? await graphRes.json() : null;
 
-    return NextResponse.json(mapBackendToInvestigationCase(inv, graph));
+    return NextResponse.json(
+      enrichEmptyGraphCase(mapBackendToInvestigationCase(inv, graph))
+    );
   } catch {
     return NextResponse.json(
       { code: "SERVER_ERROR", message: "Failed to process investigation request" },

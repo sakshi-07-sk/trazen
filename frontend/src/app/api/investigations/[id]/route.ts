@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { MOCK_ETH_CASE, MOCK_BTC_CASE } from "@/lib/mockData";
 import {
   BACKEND_URL,
+  enrichEmptyGraphCase,
   getBackendHeaders,
   mapBackendToInvestigationCase,
 } from "@/lib/mapper";
@@ -59,7 +60,7 @@ export async function GET(
     const risk = riskRes.ok ? await riskRes.json() : null;
 
     return NextResponse.json(
-      mapBackendToInvestigationCase(inv, graph, findings, risk)
+      enrichEmptyGraphCase(mapBackendToInvestigationCase(inv, graph, findings, risk))
     );
   } catch {
     return NextResponse.json(
